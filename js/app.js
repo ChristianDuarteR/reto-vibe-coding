@@ -95,6 +95,63 @@
     return `${d}/${m}/${y}`;
   }
 
+  function fechaHaceDias(dias) {
+    const fecha = new Date();
+    fecha.setHours(0, 0, 0, 0);
+    fecha.setDate(fecha.getDate() - dias);
+    return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`;
+  }
+
+  function visitasRecientes() {
+    const limite = fechaHaceDias(29);
+    const limiteSuperior = hoy();
+    return pacientes.flatMap((p) => p.visitas
+      .filter((v) => v.fecha >= limite && v.fecha <= limiteSuperior)
+      .map((v) => ({ paciente: p, visita: v })))
+      .sort((a, b) => b.visita.fecha.localeCompare(a.visita.fecha));
+  }
+
+  function renderVisitasRecientes() {
+    const recientes = visitasRecientes();
+    $("rango-visitas").textContent = `Del ${formatoFecha(fechaHaceDias(29))} al ${formatoFecha(hoy())}`;
+    $("visitas-recientes").innerHTML = recientes.map(({ paciente, visita }) => `
+      <tr>
+        <td>${escapar(paciente.nombre)}</td>
+        <td>${paciente.responsables.map((r) => escapar(r.nombre)).join(", ")}</td>
+        <td>${formatoFecha(visita.fecha)}</td>
+        <td>${escapar(visita.motivo)}</td>
+      </tr>`).join("");
+    $("sin-visitas-recientes").hidden = recientes.length > 0;
+  }
+
+  function csvValor(valor) {
+    return `"${String(valor).replace(/"/g, '""')}"`;
+  }
+
+  function exportarVisitas() {
+    const filas = visitasRecientes().flatMap(({ paciente, visita }) =>
+      paciente.responsables.map((responsable) => [
+        paciente.nombre, responsable.nombre, visita.fecha, visita.motivo
+      ]));
+    if (!filas.length) {
+      mensaje($("msg-exportacion"), "No hay visitas recientes para exportar.", "error");
+      return;
+    }
+    const csv = [
+      ["Mascota", "Responsable", "Fecha", "Motivo"],
+      ...filas
+    ].map((fila) => fila.map(csvValor).join(",")).join("\r\n");
+    const enlace = document.createElement("a");
+    const url = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
+    enlace.href = url;
+    enlace.download = "visitas-ultimos-30-dias.csv";
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+    mensaje($("msg-exportacion"), `${filas.length} fila(s) exportada(s).`, "ok");
+  }
+
   function mensaje(el, texto, tipo) {
     el.textContent = texto;
     el.className = "msg " + tipo;
@@ -172,6 +229,7 @@
     renderDetalle();
     renderSugeridos();
     renderResponsables();
+    renderVisitasRecientes();
   }
 
   function seleccionar(id) {
@@ -213,6 +271,7 @@
     if (li && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); seleccionar(li.dataset.id); }
   });
   $("buscar").addEventListener("input", renderLista);
+  $("exportar-visitas").addEventListener("click", exportarVisitas);
 
   $("form-paciente").addEventListener("submit", (e) => {
     e.preventDefault();

@@ -97,6 +97,29 @@
         <ul id="lista-responsables" class="patient-list"></ul>
         <div id="detalle-responsable"></div>
       </div>
+
+      <div class="card">
+        <div class="section-heading">
+          <h2>Visitas de los últimos 30 días</h2>
+          <button type="button" id="exportar-visitas">Descargar CSV</button>
+        </div>
+        <p class="muted" id="rango-visitas"></p>
+        <div class="table-wrap">
+          <table class="visits-table">
+            <thead>
+              <tr>
+                <th>Mascota</th>
+                <th>Responsable</th>
+                <th>Fecha</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody id="visitas-recientes"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="sin-visitas-recientes">No hay visitas en este periodo.</p>
+        <p class="msg" id="msg-exportacion" role="status"></p>
+      </div>
     </section>
   </main>
 

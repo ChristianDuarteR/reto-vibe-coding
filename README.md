@@ -8,6 +8,7 @@ Aplicación web sencilla (HTML + CSS + JavaScript, sin frameworks ni dependencia
 2. **Registrar visita**: se elige un paciente existente y se guarda fecha, motivo y observaciones.
 3. **Consultar pacientes e historial**: lista con buscador (por mascota o responsable); al seleccionar un paciente se muestra su ficha, **todos sus responsables** y sus visitas (más recientes primero).
 4. **Consultar responsables**: la tarjeta "Responsables" lista a cada responsable; al seleccionarlo se muestran **todas sus mascotas**.
+5. **Consultar visitas recientes**: la tarjeta "Visitas de los últimos 30 días" muestra solo las visitas del periodo actual y permite descargarlas en CSV con mascota, responsable, fecha y motivo.
 
 ### Múltiples responsables
 
@@ -52,3 +53,8 @@ Para reiniciar los datos de ejemplo, borre los datos del sitio (localStorage) en
 1. Haga clic en "Luna": se ven su ficha y 2 visitas.
 2. Haga clic en "Coco": debe mostrar la visita recién agregada.
 3. Escriba "max" en el buscador: la lista se filtra.
+
+**Visitas recientes y CSV**
+1. Registre una visita con fecha de hoy o dentro de los últimos 29 días: aparece en la tarjeta "Visitas de los últimos 30 días".
+2. Las visitas anteriores al periodo no aparecen en esa tarjeta.
+3. Pulse "Descargar CSV": se descarga `visitas-ultimos-30-dias.csv` con una fila por responsable de cada visita reciente.
